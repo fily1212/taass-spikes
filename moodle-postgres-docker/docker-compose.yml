@@ -1,0 +1,61 @@
+version: '3.8'
+
+
+services:
+ # Servizio Database (PostgreSQL)
+ db: # Nome del servizio a cui Moodle si riferirà
+   image: postgres:15 # Immagine ufficiale PostgreSQL (o altra versione desiderata)
+   container_name: moodle_postgres_db # Nome specifico per il container DB
+   restart: always
+   environment:
+     # Variabili d'ambiente per PostgreSQL
+     POSTGRES_DB: moodle_db           # Nome del database per Moodle
+     POSTGRES_USER: moodle_user         # Utente per Moodle
+     POSTGRES_PASSWORD: strong_moodle_password # Password per l'utente (CAMBIARE!)
+     # Non servono altre variabili come PGDATA se si usa il volume standard
+   volumes:
+     - pg_data:/var/lib/postgresql/data # Volume per persistere i dati di PostgreSQL
+   networks:
+     - moodle_net # Collega alla rete condivisa
+
+
+ # Servizio Applicazione (Moodle by Bitnami)
+ moodle:
+   image: bitnami/moodle:latest # Immagine Moodle mantenuta da Bitnami
+   container_name: moodle_app_with_pg # Nome specifico per il container Moodle
+   restart: always
+   depends_on:
+     - db # Moodle dipende dal servizio 'db' (PostgreSQL)
+   ports:
+     # Mappa le porte per accedere a Moodle dall'esterno
+     - "8081:8080" # Mappa porta host 8081 a porta container 8080 (HTTP)
+     - "8444:8443" # Mappa porta host 8444 a porta container 8443 (HTTPS, se attivo)
+   environment:
+     # --- Configurazione Database Moodle (puntando a PostgreSQL) ---
+     MOODLE_DATABASE_TYPE: pgsql           # *** Specifica che il DB è PostgreSQL ***
+     MOODLE_DATABASE_HOST: db              # Hostname = nome del servizio 'db'
+     MOODLE_DATABASE_PORT_NUMBER: 5432     # *** Porta standard di PostgreSQL ***
+     MOODLE_DATABASE_USER: moodle_user     # Utente definito nel servizio 'db'
+     MOODLE_DATABASE_PASSWORD: strong_moodle_password # Password definita nel servizio 'db' (USA LA STESSA!)
+     MOODLE_DATABASE_NAME: moodle_db       # Nome DB definito nel servizio 'db'
+     MOODLE_USERNAME: admin
+     MOODLE_PASSWORD: admin12345
+     MOODLE_EMAIL: admin@example.com
+     MOODLE_SITE_NAME: My Moodle with Postgres
+
+
+     # --- Altre configurazioni Bitnami ---
+     ALLOW_EMPTY_PASSWORD: 'no' # Impostazione di sicurezza Bitnami
+   volumes:
+     - moodle_data:/bitnami/moodle # Volume per i dati di Moodle (config, moodledata, etc.)
+   networks:
+     - moodle_net # Collega alla rete condivisa
+
+
+volumes:
+ pg_data:     # Volume nominato per i dati PostgreSQL
+ moodle_data: # Volume nominato per i dati Moodle
+
+
+networks:
+ moodle_net:  # Rete custom per la comunicazione tra i container

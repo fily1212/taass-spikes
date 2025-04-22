@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Catalog</title>
+    <style> /* Basic styling */
+    body { font-family: sans-serif; }
+    table { border-collapse: collapse; width: 80%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .cart-info { margin-bottom: 20px; }
+    button { padding: 5px 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h1>Prodotti Disponibili</h1>
+<div class="cart-info">
+    <span>Carrello: <span th:text="${shoppingCart.itemCount}">0</span> articoli</span> |
+    <a href="/cart">Vedi Carrello</a>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Prezzo</th>
+        <th>Azione</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="product : ${products}">
+        <td th:text="${product.name}">Nome Prodotto</td>
+        <td th:text="${#numbers.formatDecimal(product.price, 1, 'POINT', 2, 'COMMA')} + ' €'">€0.00</td>
+        <td>
+            <form th:action="@{/cart/add}" method="post" style="display:inline;">
+                <input type="hidden" name="productId" th:value="${product.id}" />
+                <input type="number" name="quantity" value="1" min="1" style="width: 40px;"/>
+                <button type="submit">Aggiungi</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

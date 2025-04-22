@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+ # Servizio Database (MariaDB)
+ db:
+   image: mariadb:10.11 # Immagine ufficiale MariaDB
+   container_name: wp_mariadb
+   restart: always
+   environment:
+     MYSQL_DATABASE: wordpress_db         # Nome del DB da creare
+     MYSQL_USER: wordpress_user           # Utente DB
+     MYSQL_PASSWORD: strongpassword       # Password utente
+     MYSQL_ROOT_PASSWORD: rootpassword    # Password root (non usata da WP, ma obbligatoria)
+   volumes:
+     - db_data:/var/lib/mysql             # Persistenza dati
+   networks:
+     - wordpress_net
+ wordpress:
+   image: wordpress:latest
+   container_name: wp_app
+   restart: always
+   depends_on:
+     - db
+   ports:
+     - "8080:80" # WordPress sarà accessibile su http://localhost:8080
+   environment:
+     WORDPRESS_DB_HOST: db:3306
+     WORDPRESS_DB_USER: wordpress_user
+     WORDPRESS_DB_PASSWORD: strongpassword
+     WORDPRESS_DB_NAME: wordpress_db
+   volumes:
+     - wp_files:/var/www/html
+   networks:
+     - wordpress_net
+volumes:
+ db_data:
+ wp_files:
+
+
+networks:
+ wordpress_net:

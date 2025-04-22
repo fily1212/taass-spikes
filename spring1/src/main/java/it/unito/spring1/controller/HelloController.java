@@ -1,15 +1,19 @@
 package it.unito.spring1.controller;
 
 import it.unito.spring1.model.Persona;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import it.unito.spring1.repository.PersonaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class HelloController {
+
+    @Autowired
+    PersonaRepository personaRepository;
 
     @GetMapping("/hello")
     public String hello(){
@@ -34,7 +38,23 @@ public class HelloController {
 
     @GetMapping("/getPersone")
     public List<Persona> getPersone(){
-        return List.of(new Persona("a","b"),
-                new Persona("c","d"));
+        return personaRepository.getPersone();
     }
+
+    @GetMapping("/findPersona/{nome}")
+    public ResponseEntity<Persona> findPersona(@PathVariable String nome){
+        Persona persona = personaRepository
+                .getPersone()
+                .stream()
+                .filter(p->p.nome().equals(nome))
+                .findFirst().orElse(null);
+
+
+        if (persona == null) {
+            return ResponseEntity.notFound().build();
+        }else
+            return ResponseEntity.ok().body(persona);
+        ResponseEntity.
+    }
+
 }

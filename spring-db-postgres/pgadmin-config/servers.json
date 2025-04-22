@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "PostgreSQL Cart DB",
+      "Group": "Docker",
+      "Host": "cart-db",
+      "Port": 5432,
+      "MaintenanceDB": "cart_db",
+      "Username": "cart_user",
+      "SSLMode": "prefer",
+      "PassFile": "/pgpass"
+    }
+  }
+}

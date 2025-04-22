@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  cart-db:
+    image: postgres:15
+    container_name: spring_db_postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: cart_db
+      POSTGRES_USER: cart_user
+      POSTGRES_PASSWORD: cart_password
+    volumes:
+      - cart_db_data:/var/lib/postgresql/data
+    networks:
+      - cart_net
+
+  app:
+    build: .
+    container_name: spring_db_postgres_app
+    restart: always
+    depends_on:
+      - cart-db
+    ports:
+      - "8090:8090"
+    environment:
+      DB_USER: cart_user
+      DB_PASSWORD: cart_password
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - cart_net
+
+volumes:
+  cart_db_data:
+
+networks:
+  cart_net:

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrello</title>
+    <style> /* Basic styling (same as index) */
+    body { font-family: sans-serif; }
+    table { border-collapse: collapse; width: 80%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .total { font-weight: bold; font-size: 1.2em; }
+    button { padding: 5px 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h1>Il tuo Carrello</h1>
+<a href="/">Continua Shopping</a>
+<div th:if="${shoppingCart.items.isEmpty()}">
+    <p>Il carrello è vuoto.</p>
+</div>
+<div th:unless="${shoppingCart.items.isEmpty()}">
+    <table>
+        <thead>
+        <tr>
+            <th>Prodotto</th>
+            <th>Quantità</th>
+            <th>Prezzo Unitario</th>
+            <th>Subtotale</th>
+            <th>Azione</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${shoppingCart.items.values()}">
+            <td th:text="${item.productName}">Nome Prodotto</td>
+            <td th:text="${item.quantity}">1</td>
+            <td th:text="${#numbers.formatDecimal(item.unitPrice, 1, 'POINT', 2, 'COMMA')} + ' €'">€0.00</td>
+            <td th:text="${#numbers.formatDecimal(item.totalPrice, 1, 'POINT', 2, 'COMMA')} + ' €'">€0.00</td>
+            <td>
+                <form th:action="@{/cart/remove}" method="post">
+                    <input type="hidden" name="productId" th:value="${item.productId}" />
+                    <button type="submit">Rimuovi</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="3" class="total">Totale:</td>
+            <td colspan="2" class="total" th:text="${#numbers.formatDecimal(shoppingCart.total, 1, 'POINT', 2, 'COMMA')} + ' €'">€0.00</td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+</body>
+</html>
